@@ -2,9 +2,10 @@ package in.strikes.crudSpringBootDemo.service;
 
 import in.strikes.crudSpringBootDemo.entity.Student;
 import in.strikes.crudSpringBootDemo.repository.StudentRepository;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -18,9 +19,41 @@ public class StudentService {
     public Student createStudent(Student studentReq) {
         //business logic
         //stores to db
-        System.out.println("Inside StudentService createStudent");
-        Student studentResp = studentRepository.saveStudent(studentReq);
-        System.out.println("Exiting StudentService createStudent");
+        Student studentResp = studentRepository.save(studentReq);
         return studentResp;
+    }
+    public Student getStudent(Long id) {
+        Optional<Student> studentResp =studentRepository.findById(id);
+        if(studentResp.isPresent()){
+            return studentResp.get();
+        }
+        return null;
+    }
+    public List<Student> getAllStudent() {
+        List<Student> studentList = studentRepository.findAll();
+        return studentList;
+    }
+    public Student updateStudent(Long id,  Student studentReq) {
+        Optional<Student> existingStudent = studentRepository.findById(id);
+        if (existingStudent.isEmpty()) {
+            return null;
+        }
+        Student studentToSave = existingStudent.get();
+        studentToSave.setName(studentReq.getName());
+        studentToSave.setAge(studentReq.getAge());
+        studentToSave.setSubject(studentReq.getSubject());
+        studentToSave.setEmail(studentReq.getEmail());
+        studentToSave.setRollNo(studentReq.getRollNo());
+
+        return studentRepository.save(studentToSave);
+    }
+    public Boolean deleteStudent(Long id) {
+        Boolean isStudent=studentRepository.existsById(id);
+        if(!isStudent){
+            return false;
+        }
+        studentRepository.deleteById(id);
+        return true;
+
     }
 }
